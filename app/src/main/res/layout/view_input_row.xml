@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/tvLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Label"
+        android:textSize="14sp"
+        android:textColor="#777777"
+        android:layout_marginBottom="6dp"/>
+
+    <EditText
+        android:id="@+id/etValue"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:hint="입력"
+        android:singleLine="true"
+        android:backgroundTint="@android:color/transparent"/>
+
+    <!-- 우측 고정 텍스트가 필요할 때만 보이게 -->
+    <TextView
+        android:id="@+id/tvTrailing"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:text=""
+        android:paddingEnd="16dp"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"/>
+
+</merge>

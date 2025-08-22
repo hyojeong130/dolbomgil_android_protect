@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical" android:padding="20dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="LOGIN" android:textSize="22sp" android:textColor="#333333"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- 재사용 컴포넌트: ID -->
+        <include
+            android:id="@+id/rowId"
+            layout="@layout/view_input_row" />
+
+        <!-- 재사용 컴포넌트: Password -->
+        <include
+            android:id="@+id/rowPw"
+            layout="@layout/view_input_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent" android:layout_height="52dp"
+            android:text="로그인" android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/btnGoSignUp"
+            android:layout_width="match_parent" android:layout_height="52dp"
+            android:text="회원가입" android:layout_marginTop="8dp"/>
+    </LinearLayout>
+</ScrollView>
