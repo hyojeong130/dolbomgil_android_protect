@@ -1,5 +1,6 @@
 package com.example.dive_pre
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dive_pre.databinding.ActivityHomeBinding
@@ -14,6 +15,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         vb = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(vb.root)
 
@@ -25,6 +27,10 @@ class HomeActivity : AppCompatActivity() {
         autoCardBinding.toggleGroup.setOnClickListener {
             isAutoOn = !isAutoOn
             renderAutoCard()
+        }
+
+        vb.btnMap.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
         }
     }
 

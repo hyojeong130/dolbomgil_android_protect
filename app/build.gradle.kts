@@ -1,6 +1,14 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+}
+
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
 }
 
 android {
@@ -22,11 +30,11 @@ android {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
 
-        buildConfigField(
-            "String",
-            "KAKAO_NATIVE_APP_KEY",                               // ← 필드 이름
-            "\"${project.findProperty("KAKAO_NATIVE_APP_KEY")}\"" // ← local.properties의 키 이름
-        )
+        val kakaoMapKey = localProps.getProperty("KAKAO_NATIVE_MAP_APP_KEY") ?: ""
+        buildConfigField("String", "KAKAO_NATIVE_MAP_APP_KEY", "\"$kakaoMapKey\"")
+
+        val kakaoNaviKey = localProps.getProperty("KAKAO_NATIVE_APP_KEY") ?: ""
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNaviKey\"")
     }
 
     buildTypes {
@@ -73,10 +81,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.9.3")
 
-//    implementation("com.kakaomobility.knsdk:knsdk:1.9.4")
     implementation("com.kakaomobility.knsdk:knsdk_ui:1.9.4")
-//    implementation("com.kakaomobility.knsdk:knsdk_guidance:1.9.4")
-//    implementation("com.kakaomobility.knsdk:knsdk_poi:1.9.4")
+
+    implementation("com.kakao.maps.open:android:2.12.15")
 
     // Compose <-> ViewBinding bridge
     implementation("androidx.compose.ui:ui-viewbinding:1.9.0")

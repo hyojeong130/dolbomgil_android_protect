@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     fun knsdkAuth() {
         KNApplication.knsdk.apply {
             initializeWithAppKey(
-                aAppKey = "3060059935835af31236c9273a6c6ff0",       // 카카오디벨로퍼스에서 부여 받은 앱 키
+                aAppKey = BuildConfig.KAKAO_NATIVE_APP_KEY,       // 카카오디벨로퍼스에서 부여 받은 앱 키
                 aClientVersion = BuildConfig.VERSION_NAME,                                               // 현재 앱의 클라이언트 버전
                 aUserKey = "testUser",                                                  // 사용자 id
                 aLangType = KNLanguageType.KNLanguageType_KOREAN,   // 언어 타입
