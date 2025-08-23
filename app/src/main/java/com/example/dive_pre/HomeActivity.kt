@@ -1,5 +1,9 @@
 package com.example.dive_pre
 
+
+import android.view.View
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.transition.TransitionManager
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -56,7 +60,9 @@ class HomeActivity : AppCompatActivity() {
         locationCard.root.setOnClickListener {
             inSafeZone = !inSafeZone
             renderLocationCard()
+            renderGuideCard()
         }
+
 
         // 설정 카드: 반경 토글(데모)
         settingsCard.root.setOnClickListener {
@@ -70,6 +76,7 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
     }
+
 
     private fun renderAutoCard() = with(autoCardBinding) {
         // 1) 카드 전체 배경(부모 FrameLayout: activity_home.xml의 @id/cardAuto)
@@ -101,10 +108,13 @@ class HomeActivity : AppCompatActivity() {
 
     private fun renderLocationCard() = with(locationCard) {
         tvTitle.text = "$targetName 님 위치"
-        val dotColor = if (inSafeZone) Color.parseColor("#C4B5FD") else Color.parseColor("#FCA5A5")
-        ViewCompat.setBackgroundTintList(ivDot, ColorStateList.valueOf(dotColor))
+
+        val dotColor = if (inSafeZone) "#C4B5FD" else "#FCA5A5"   // 보라/빨강
+        ViewCompat.setBackgroundTintList(ivDot, ColorStateList.valueOf(Color.parseColor(dotColor)))
+
         tvStatus.text = if (inSafeZone) "현재 안전 구역 내에 위치" else "안전 구역 밖에 있음"
     }
+
 
     private fun renderSettingsCard() = with(settingsCard) {
         tvTitle.text = "설정"
@@ -112,7 +122,52 @@ class HomeActivity : AppCompatActivity() {
         tvDesc.text = "반경 ${radiusMeters}m"
     }
 
+    private fun applyGuidePlacement() {
+        val root = vb.homeRoot
+        val cs = ConstraintSet().apply { clone(root) }
+
+        // 기존 TOP 제약 정리
+        cs.clear(R.id.cardGuide, ConstraintSet.TOP)
+        cs.clear(R.id.cardLocation, ConstraintSet.TOP)
+
+        if (inSafeZone) {
+            // 안전: 위치/설정 위, 길안내 아래
+            cs.connect(R.id.cardLocation, ConstraintSet.TOP, R.id.cardAuto, ConstraintSet.BOTTOM)
+            cs.connect(R.id.cardGuide,    ConstraintSet.TOP, R.id.cardLocation, ConstraintSet.BOTTOM)
+        } else {
+            // 이탈: 길안내를 위로, 그 아래 위치/설정
+            cs.connect(R.id.cardGuide,    ConstraintSet.TOP, R.id.cardAuto, ConstraintSet.BOTTOM)
+            cs.connect(R.id.cardLocation, ConstraintSet.TOP, R.id.cardGuide, ConstraintSet.BOTTOM)
+            // settings는 location 오른쪽 기존 제약 유지
+        }
+
+        androidx.transition.TransitionManager.beginDelayedTransition(root)
+        cs.applyTo(root)
+    }
+
+
     private fun renderGuideCard() = with(guideCard) {
         tvTitle.text = "$targetName 님 위치로 바로 길안내"
+
+        if (inSafeZone) {
+            // 연두 배경, 알림 숨김
+            vb.cardGuide.setBackgroundResource(R.drawable.bg_card_guide)
+            alertRow.visibility = View.GONE
+        } else {
+            // 빨강 배경, 알림 표시
+            vb.cardGuide.setBackgroundResource(R.drawable.bg_card_guide_alert)
+            alertRow.visibility = View.VISIBLE
+            tvAlert.text = "$targetName 님이 안전 구역을 벗어났습니다"
+
+            // 경고 점을 붉은색으로
+            ViewCompat.setBackgroundTintList(
+                ivAlertDot,
+                ColorStateList.valueOf(Color.parseColor("#FCA5A5"))
+            )
+        }
+
+        // ⬇️ 배치도 함께 바꾸기
+        applyGuidePlacement()
     }
+
 }
