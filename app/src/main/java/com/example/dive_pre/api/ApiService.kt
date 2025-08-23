@@ -31,9 +31,14 @@ data class LoginUserData(
     val phone_number: String
 )
 
+data class CareeStatusResponse(
+    val has_registered_caree: Boolean
+)
+
 object ApiService {
     private val BASE_URL = com.example.dive_pre.BuildConfig.API_BASE_URL
     private const val LOGIN_ENDPOINT = "/api/user/login"
+    private const val CAREE_STATUS_ENDPOINT = "/api/user/caree-status"
     
     suspend fun login(
         userId: String, 
@@ -71,6 +76,29 @@ object ApiService {
             
             val gson = Gson()
             gson.fromJson(responseBody, LoginResponse::class.java)
+        }
+    }
+    
+    suspend fun checkCareeStatus(accessToken: String): CareeStatusResponse {
+        return withContext(Dispatchers.IO) {
+            val client = OkHttpClient()
+            
+            val request = Request.Builder()
+                .url("$BASE_URL$CAREE_STATUS_ENDPOINT")
+                .get()
+                .addHeader("Authorization", "Bearer $accessToken")
+                .build()
+                
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() 
+                ?: throw Exception("응답이 비어있습니다")
+            
+            if (!response.isSuccessful) {
+                throw Exception("HTTP 오류: ${response.code}")
+            }
+            
+            val gson = Gson()
+            gson.fromJson(responseBody, CareeStatusResponse::class.java)
         }
     }
     

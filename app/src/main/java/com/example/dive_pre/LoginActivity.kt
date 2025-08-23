@@ -78,8 +78,9 @@ class LoginActivity : AppCompatActivity() {
                 if (loginResponse.success) {
                     TokenManager.saveAccessToken(this@LoginActivity, loginResponse.access_token)
                     Toast.makeText(this@LoginActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
-                    finish()
+                    
+                    // 케어 대상자 등록 상태 확인
+                    checkCareeRegistrationStatus(loginResponse.access_token)
                 } else {
                     Toast.makeText(this@LoginActivity, "로그인 실패: ${loginResponse.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -87,6 +88,31 @@ class LoginActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "로그인 오류", e)
                 Toast.makeText(this@LoginActivity, "로그인 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun checkCareeRegistrationStatus(accessToken: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val careeStatusResponse = ApiService.checkCareeStatus(accessToken)
+                
+                if (careeStatusResponse.has_registered_caree) {
+                    // 이미 케어 대상자가 등록되어 있으면 홈으로 이동
+                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                    finish()
+                } else {
+                    // 케어 대상자가 등록되어 있지 않으면 Step2 회원가입으로 이동
+                    startActivity(Intent(this@LoginActivity, SignUpStep2Activity::class.java))
+                    finish()
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "케어 대상자 상태 확인 오류", e)
+                Toast.makeText(this@LoginActivity, "상태 확인 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                // 오류 발생 시 홈으로 이동 (기본값)
+                startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                finish()
             }
         }
     }
