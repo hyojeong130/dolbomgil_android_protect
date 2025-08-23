@@ -24,7 +24,7 @@ class SignUpStep2Activity : AppCompatActivity() {
 
         // Complete 버튼 → HomeActivity로 이동
         vb.btnComplete.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finishAffinity() // 회원가입 스텝 액티비티 전부 종료
         }

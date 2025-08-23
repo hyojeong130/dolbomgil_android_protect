@@ -2,33 +2,41 @@ package com.example.dive_pre
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.dive_pre.databinding.ActivityHomeBinding
+import com.example.dive_pre.databinding.ViewCardAutoBinding
 
 class HomeActivity : AppCompatActivity() {
+
+    private lateinit var vb: ActivityHomeBinding
+    private lateinit var autoCardBinding: ViewCardAutoBinding   // nullable 아님
+
+    private var isAutoOn = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        vb = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(vb.root)
 
-        // HomeActivity.kt (onCreate 안)
-        val cardAuto = findViewById<FrameLayout>(R.id.cardAuto)
-        val tvToggle = findViewById<TextView>(R.id.tvToggle)
+        // ⬇️ bind() 호출 없이 그대로 사용
+        autoCardBinding = vb.includeAuto
 
-// 초기 상태: ON
-        var isOn = true
-        cardAuto.setBackgroundResource(R.drawable.bg_card_auto_on)
-        tvToggle.text = "ON"
+        renderAutoCard()
 
-// 토글 클릭으로 ON/OFF 전환
-        findViewById<android.view.View>(R.id.toggleGroup).setOnClickListener {
-            isOn = !isOn
-            if (isOn) {
-                cardAuto.setBackgroundResource(R.drawable.bg_card_auto_on)
-                tvToggle.text = "ON"
-            } else {
-                cardAuto.setBackgroundResource(R.drawable.bg_card_auto_off)
-                tvToggle.text = "OFF"
-            }
+        autoCardBinding.toggleGroup.setOnClickListener {
+            isAutoOn = !isAutoOn
+            renderAutoCard()
         }
-
     }
 
+    private fun renderAutoCard() = with(autoCardBinding) {
+        ivToggleOuter.setBackgroundResource(
+            if (isAutoOn) R.drawable.bg_toggle_outer_on else R.drawable.bg_toggle_outer_off
+        )
+        tvToggle.setBackgroundResource(
+            if (isAutoOn) R.drawable.bg_toggle_inner_on else R.drawable.bg_toggle_inner_off
+        )
+        tvToggle.text = if (isAutoOn) "ON" else "OFF"
+        ivDot.setBackgroundResource(R.drawable.bg_status_dot)
+        tvStatus.text = if (isAutoOn) "활성화" else "비활성화"
+    }
 }

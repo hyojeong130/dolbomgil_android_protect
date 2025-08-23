@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <!-- 바깥 링 배경(연한 청록) -->
+    <solid android:color="#E1F6F8"/>
+    <!-- 링 효과: 안쪽을 흰색 원으로 덮어서 두께 느낌 -->
+    <size android:width="85dp" android:height="85dp"/>
+    <stroke android:width="0dp" android:color="@android:color/transparent"/>
+    <padding android:left="10dp" android:top="10dp" android:right="10dp" android:bottom="10dp"/>
+</shape>

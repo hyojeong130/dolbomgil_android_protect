@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <!-- 좌측 아이콘 (임시로 시스템 아이콘 사용) -->
+    <!-- 좌측 아이콘 -->
     <ImageView
         android:id="@+id/ivIcon"
         android:layout_width="28dp"
@@ -50,14 +50,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 바깥 옅은 링 -->
-        <View
-            android:id="@+id/toggleOuter"
+        <!-- 바깥 링 -->
+        <ImageView
+            android:id="@+id/ivToggleOuter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_toggle_outer"/>
+            android:background="@drawable/bg_toggle_outer_on"
+            android:contentDescription="@null"/>
 
-        <!-- 안쪽 흰 원 + 텍스트 -->
+        <!-- 안쪽 원 + 텍스트 -->
         <TextView
             android:id="@+id/tvToggle"
             android:layout_width="75dp"
@@ -67,18 +68,18 @@
             android:textColor="#111111"
             android:textSize="26sp"
             android:fontFamily="sans-serif-medium"
-            android:background="@drawable/bg_toggle_inner"
+            android:background="@drawable/bg_toggle_inner_on"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 좌하단 작은 점 + '활성화' -->
-    <ImageView
+    <!-- 좌하단 상태 점 -->
+    <View
         android:id="@+id/ivDot"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
         android:background="@drawable/bg_status_dot"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -90,7 +91,7 @@
         android:text="활성화"
         android:textColor="#707070"
         android:textSize="16sp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="6dp"
         app:layout_constraintStart_toEndOf="@id/ivDot"
         app:layout_constraintBottom_toBottomOf="@id/ivDot"/>
 
