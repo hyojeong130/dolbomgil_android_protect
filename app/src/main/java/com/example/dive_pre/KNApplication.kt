@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
+import com.kakao.vectormap.KakaoMapSdk
 import com.kakaomobility.knsdk.KNSDK
 
 class KNApplication : Application() {
@@ -17,7 +18,13 @@ class KNApplication : Application() {
         initialize()
         createNotificationChannel()
         getFCMToken()
+        initializeMap()
     }
+
+    fun initializeMap(){
+        KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_MAP_APP_KEY)
+    }
+
     /**
      * 길찾기 SDK의 초기화 및 파일이 저장될 경로를 설정합니다
      */
@@ -40,7 +47,7 @@ class KNApplication : Application() {
             ).apply {
                 description = "Firebase Cloud Messaging 알림"
             }
-            
+
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }

@@ -43,6 +43,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         vb = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(vb.root)
 
@@ -84,6 +85,10 @@ class HomeActivity : AppCompatActivity() {
         guideCard.root.setOnClickListener {
             val uri = Uri.parse("geo:$targetLat,$targetLng?q=$targetLat,$targetLng($careeName)")
             startActivity(Intent(Intent.ACTION_VIEW, uri))
+        }
+
+        vb.btnMap.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
         }
     }
     

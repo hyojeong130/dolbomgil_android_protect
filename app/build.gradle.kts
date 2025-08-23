@@ -1,7 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+}
+
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
 }
 
 android {
@@ -23,6 +31,9 @@ android {
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
+
+        val kakaoMapKey = localProps.getProperty("KAKAO_NATIVE_MAP_APP_KEY") ?: ""
+        buildConfigField("String", "KAKAO_NATIVE_MAP_APP_KEY", "\"$kakaoMapKey\"")
 
         buildConfigField(
             "String",
@@ -80,10 +91,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.9.3")
 
-//    implementation("com.kakaomobility.knsdk:knsdk:1.9.4")
     implementation("com.kakaomobility.knsdk:knsdk_ui:1.9.4")
-//    implementation("com.kakaomobility.knsdk:knsdk_guidance:1.9.4")
-//    implementation("com.kakaomobility.knsdk:knsdk_poi:1.9.4")
+
+    implementation("com.kakao.maps.open:android:2.12.15")
 
     // Compose <-> ViewBinding bridge
     implementation("androidx.compose.ui:ui-viewbinding:1.9.0")
@@ -91,7 +101,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation(libs.play.services.maps)
+    implementation("com.kakao.maps.open:android:2.12.8")
 
     // HTTP 통신을 위한 의존성
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

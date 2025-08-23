@@ -1,0 +1,28 @@
+<!-- res/layout/activity_map.xml -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.kakao.vectormap.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 지도 위 오버레이 버튼 -->
+    <Button
+        android:id="@+id/btn_start_nav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp"
+        android:backgroundTint="@null"
+        android:text="안내 시작"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:background="@drawable/btn_start_nav_bg"
+        android:drawableStart="@drawable/ic_nav"
+        android:padding="8dp" />
+
+
+
+</FrameLayout>

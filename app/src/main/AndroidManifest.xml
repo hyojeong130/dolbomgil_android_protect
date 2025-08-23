@@ -44,6 +44,7 @@
         <activity android:name=".SignUpStep1Activity"/>
         <activity android:name=".SignUpStep2Activity"/>
         <activity android:name=".HomeActivity"/>
+        <activity android:name=".MapActivity" />
 
         <activity
             android:name=".NaviActivity"
