@@ -51,12 +51,100 @@ data class SafeZoneToggleResponse(
     val safe_zone_active: Boolean
 )
 
+data class LocationBothResponse(
+    val protector_location: LocationInfo,
+    val caree_location: LocationInfo
+)
+
+data class LocationInfo(
+    val position_id: Int,
+    val latitude: Double,
+    val longitude: Double,
+    val accuracy_meters: Double,
+    val battery_level: Int,
+    val is_inside_safe_zone: Boolean?,
+    val recorded_at: String
+)
+
+data class DetailedNavigationResponse(
+    val trans_id: String,
+    val routes: List<DetailedRoute>
+)
+
+data class DetailedRoute(
+    val result_code: Int,
+    val result_msg: String,
+    val summary: DetailedSummary,
+    val sections: List<DetailedSection>,
+    val distance: Int,
+    val duration: Int
+)
+
+data class RoutePoint(
+    val name: String,
+    val x: Double,
+    val y: Double
+)
+
+data class RouteBound(
+    val min_x: Double,
+    val min_y: Double,
+    val max_x: Double,
+    val max_y: Double
+)
+
+data class RouteFare(
+    val taxi: Int,
+    val toll: Int
+)
+
+data class DetailedSummary(
+    val origin: RoutePoint,
+    val destination: RoutePoint,
+    val waypoints: List<RoutePoint>,
+    val priority: String,
+    val bound: RouteBound,
+    val fare: RouteFare,
+    val distance: Int,
+    val duration: Int
+)
+
+data class DetailedSection(
+    val distance: Int,
+    val duration: Int,
+    val bound: RouteBound,
+    val roads: List<Road>,
+    val guides: List<Guide>
+)
+
+data class Road(
+    val name: String,
+    val distance: Int,
+    val duration: Int,
+    val traffic_speed: Int,
+    val traffic_state: Int,
+    val vertexes: List<List<Double>>
+)
+
+data class Guide(
+    val name: String,
+    val x: Double,
+    val y: Double,
+    val distance: Int,
+    val duration: Int,
+    val type: Int,
+    val guidance: String,
+    val road_index: Int
+)
+
 object ApiService {
     private val BASE_URL = com.example.dive_pre.BuildConfig.API_BASE_URL
     private const val LOGIN_ENDPOINT = "/api/user/login"
     private const val CAREE_STATUS_ENDPOINT = "/api/user/caree-status"
     private const val HOME_INFO_ENDPOINT = "/api/home/info"
     private const val SAFEZONE_TOGGLE_ENDPOINT = "/api/safezone/toggle"
+    private const val LOCATION_BOTH_ENDPOINT = "/api/location/both"
+    private const val DETAILED_NAVIGATION_ENDPOINT = "/navigation/route/protector-to-caree"
     
     suspend fun login(
         userId: String, 
@@ -163,6 +251,60 @@ object ApiService {
             
             val gson = Gson()
             gson.fromJson(responseBody, SafeZoneToggleResponse::class.java)
+        }
+    }
+    
+    suspend fun getBothLocations(accessToken: String): LocationBothResponse {
+        return withContext(Dispatchers.IO) {
+            val client = OkHttpClient()
+            
+            val request = Request.Builder()
+                .url("$BASE_URL$LOCATION_BOTH_ENDPOINT")
+                .get()
+                .addHeader("Authorization", "Bearer $accessToken")
+                .build()
+                
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() 
+                ?: throw Exception("응답이 비어있습니다")
+            
+            if (!response.isSuccessful) {
+                throw Exception("HTTP 오류: ${response.code}")
+            }
+            
+            val gson = Gson()
+            gson.fromJson(responseBody, LocationBothResponse::class.java)
+        }
+    }
+    
+    suspend fun getDetailedNavigationRoute(accessToken: String): DetailedNavigationResponse {
+        return withContext(Dispatchers.IO) {
+            val client = OkHttpClient()
+            
+            val url = "$BASE_URL$DETAILED_NAVIGATION_ENDPOINT" +
+                "?priority=RECOMMEND" +
+                "&summary=false" +
+                "&alternatives=false" +
+                "&road_details=false" +
+                "&car_fuel=GASOLINE" +
+                "&car_hipass=false"
+            
+            val request = Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("Authorization", "Bearer $accessToken")
+                .build()
+                
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() 
+                ?: throw Exception("응답이 비어있습니다")
+            
+            if (!response.isSuccessful) {
+                throw Exception("HTTP 오류: ${response.code}")
+            }
+            
+            val gson = Gson()
+            gson.fromJson(responseBody, DetailedNavigationResponse::class.java)
         }
     }
     
