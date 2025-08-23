@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 좌측 원형 아이콘 배경 -->
+    <ImageView
+        android:id="@+id/ivIconBg"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_icon_circle"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- 좌측 아이콘 (임시로 시스템 아이콘 사용) -->
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        app:tint="#6B6B6B"
+        android:src="@android:drawable/ic_media_play"
+        app:layout_constraintStart_toStartOf="@id/ivIconBg"
+        app:layout_constraintEnd_toEndOf="@id/ivIconBg"
+        app:layout_constraintTop_toTopOf="@id/ivIconBg"
+        app:layout_constraintBottom_toBottomOf="@id/ivIconBg"/>
+
+    <!-- 타이틀 -->
+    <TextView
+        android:id="@+id/tvTitleAuto"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="자동 안심 케어"
+        android:textColor="#111111"
+        android:textSize="22sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintStart_toEndOf="@id/ivIconBg"
+        app:layout_constraintTop_toTopOf="@id/ivIconBg"
+        app:layout_constraintBottom_toBottomOf="@id/ivIconBg"
+        app:layout_constraintEnd_toStartOf="@+id/toggleGroup"
+        android:layout_marginStart="16dp"/>
+
+    <!-- 우측 큰 원형 토글 그룹 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toggleGroup"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 바깥 옅은 링 -->
+        <View
+            android:id="@+id/toggleOuter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_toggle_outer"/>
+
+        <!-- 안쪽 흰 원 + 텍스트 -->
+        <TextView
+            android:id="@+id/tvToggle"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:gravity="center"
+            android:text="ON"
+            android:textColor="#111111"
+            android:textSize="26sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_toggle_inner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 좌하단 작은 점 + '활성화' -->
+    <ImageView
+        android:id="@+id/ivDot"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:background="@drawable/bg_status_dot"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="활성화"
+        android:textColor="#707070"
+        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/ivDot"
+        app:layout_constraintBottom_toBottomOf="@id/ivDot"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
