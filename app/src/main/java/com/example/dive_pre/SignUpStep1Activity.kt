@@ -102,10 +102,10 @@ class SignUpStep1Activity : AppCompatActivity() {
             try {
                 val result = signUpApi(userId, name, phone, password)
                 if (result.success) {
-                    Toast.makeText(this@SignUpStep1Activity, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    // 회원가입 성공 시 다음 단계로 이동
-                    startActivity(Intent(this@SignUpStep1Activity, SignUpStep2Activity::class.java))
-                    finish()
+                    Toast.makeText(this@SignUpStep1Activity, "보호자 회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                    // 보호자 회원가입 성공 시 로그인 화면으로 이동
+                    startActivity(Intent(this@SignUpStep1Activity, LoginActivity::class.java))
+                    finishAffinity() // 회원가입 관련 액티비티 모두 종료
                 } else {
                     Toast.makeText(this@SignUpStep1Activity, "회원가입 실패: ${result.message}", Toast.LENGTH_SHORT).show()
                 }

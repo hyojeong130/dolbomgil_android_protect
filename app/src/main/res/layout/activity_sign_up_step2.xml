@@ -49,15 +49,23 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp" />
 
+
         <include
-            android:id="@+id/rowId"
+            android:id="@+id/rowBirth"
             layout="@layout/view_input_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp" />
 
         <include
-            android:id="@+id/rowBirth"
+            android:id="@+id/rowGender"
+            layout="@layout/view_radio_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+
+        <include
+            android:id="@+id/rowCareLevel"
             layout="@layout/view_input_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

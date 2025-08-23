@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">DIVE_PRE</string>
     <string name="back">뒤로가기</string>
+    
+    <!-- Gender selection options -->
+    <string-array name="gender_options">
+        <item>성별 선택</item>
+        <item>남성</item>
+        <item>여성</item>
+    </string-array>
 </resources>
