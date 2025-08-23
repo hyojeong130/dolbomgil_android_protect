@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import android.util.Log
 
 data class LoginRequest(
     val user_id: String,
@@ -181,11 +182,13 @@ object ApiService {
 
         val ROUTE_ENDPOINT = "/navigation/route/protector-to-caree"
 
+        Log.d("ApiService", "=== 경로 조회 API 호출 ===")
+        Log.d("ApiService", "엔드포인트: $ROUTE_ENDPOINT")
+        Log.d("ApiService", "파라미터: priority=$priority, summary=$summary, alternatives=$alternatives, roadDetails=$roadDetails, carFuel=$carFuel, carHipass=$carHipass")
 
         val client = OkHttpClient()
         val gson = Gson()
 
-        // BASE_URL + ROUTE_ENDPOINT + 쿼리
         // BASE_URL + ROUTE_ENDPOINT + 쿼리
         val url = ("$BASE_URL$ROUTE_ENDPOINT").toHttpUrlOrNull()
             ?.newBuilder()
@@ -199,6 +202,7 @@ object ApiService {
             }
             ?.build() ?: throw IllegalStateException("잘못된 URL: $BASE_URL$ROUTE_ENDPOINT")
 
+        Log.d("ApiService", "최종 URL: $url")
 
         val request = Request.Builder()
             .url(url)
@@ -207,15 +211,33 @@ object ApiService {
             .addHeader("Authorization", "Bearer $accessToken") // ★ 필수
             .build()
 
+        Log.d("ApiService", "요청 헤더: Authorization=Bearer ${accessToken.take(10)}...")
+
         val response = client.newCall(request).execute()
         val responseBody = response.body?.string()
             ?: throw Exception("응답이 비어있습니다")
 
+        Log.d("ApiService", "응답 코드: ${response.code}")
+        Log.d("ApiService", "응답 메시지: ${response.message}")
+        Log.d("ApiService", "응답 바디 길이: ${responseBody.length}")
+
         if (!response.isSuccessful) {
+            Log.e("ApiService", "HTTP 오류: ${response.code} ${response.message}")
+            Log.e("ApiService", "응답 바디: $responseBody")
             throw Exception("HTTP 오류: ${response.code} ${response.message}\n$responseBody")
         }
 
-        gson.fromJson(responseBody, RouteResponse::class.java)
+        Log.d("ApiService", "API 호출 성공! 응답 파싱 중...")
+        
+        try {
+            val routeResponse = gson.fromJson(responseBody, RouteResponse::class.java)
+            Log.d("ApiService", "응답 파싱 성공: trans_id=${routeResponse.trans_id}, routes=${routeResponse.routes.size}개")
+            routeResponse
+        } catch (e: Exception) {
+            Log.e("ApiService", "응답 파싱 실패", e)
+            Log.e("ApiService", "응답 바디: $responseBody")
+            throw Exception("응답 파싱 실패: ${e.message}")
+        }
     }
 
 }

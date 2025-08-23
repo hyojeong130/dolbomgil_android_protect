@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.dive_pre.api.ApiService
+import com.example.dive_pre.api.RouteResponse
 import com.example.dive_pre.api.toLatLngs
+import com.example.dive_pre.utils.TokenManager
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
@@ -28,6 +30,9 @@ class MapActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
+        // 저장된 access_token을 MyTokenStore에 복원
+        restoreAccessToken()
+
         mapView = findViewById(R.id.map_view)
         mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {}
@@ -46,30 +51,68 @@ class MapActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * SharedPreferences에 저장된 access_token을 MyTokenStore에 복원합니다
+     */
+    private fun restoreAccessToken() {
+        val savedToken = TokenManager.getAccessToken(this)
+        if (savedToken != null) {
+            MyTokenStore.setToken(savedToken)
+            Log.d("MapActivity", "저장된 access_token 복원 완료")
+        } else {
+            Log.w("MapActivity", "저장된 access_token이 없습니다")
+        }
+    }
+
     private fun fetchAndDrawRoute(kakaoMap: KakaoMap) {
-        val token = MyTokenStore.token
+        val token = MyTokenStore.getToken()
         if (token.isNullOrBlank()) {
             Toast.makeText(this, "로그인 후 이용해주세요.", Toast.LENGTH_SHORT).show()
             Log.w("Route", "토큰 없음 → 호출 중단")
             return
         }
 
+        Log.d("Route", "=== 경로 조회 시작 ===")
+        Log.d("Route", "토큰: ${token.take(10)}...")
+        Log.d("Route", "API 호출 파라미터: priority=RECOMMEND, summary=false, alternatives=false, road_details=false")
+
         lifecycleScope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
+                    Log.d("Route", "API 호출 중...")
                     ApiService.getProtectorToCareeRoute(
                         accessToken = token,
                         priority = "RECOMMEND",
-                        summary = true,
+                        summary = false,  // curl과 동일하게 false
                         alternatives = false,
-                        roadDetails = false
+                        roadDetails = false,  // curl과 동일하게 false
+                        carFuel = "GASOLINE",  // curl과 동일하게 GASOLINE
+                        carHipass = false      // curl과 동일하게 false
                     )
                 }
             }.onSuccess { resp ->
+                Log.d("Route", "=== API 응답 성공 ===")
+                Log.d("Route", "trans_id: ${resp.trans_id}")
+                Log.d("Route", "routes 개수: ${resp.routes.size}")
+                
+                // 경로 정보 로그 출력
+                resp.routes.firstOrNull()?.let { route ->
+                    Log.d("Route", "=== 경로 정보 ===")
+                    Log.d("Route", "결과: ${route.result_msg}")
+                    Log.d("Route", "거리: ${route.distance}m")
+                    Log.d("Route", "시간: ${route.duration}초")
+                    Log.d("Route", "출발지: (${route.summary.origin.y}, ${route.summary.origin.x})")
+                    Log.d("Route", "목적지: (${route.summary.destination.y}, ${route.summary.destination.x})")
+                    Log.d("Route", "좌표 개수: ${resp.toLatLngs().size}")
+                    Log.d("Route", "=================")
+                }
+                
                 val latLngs = resp.toLatLngs()
                 Log.i("Route", "좌표 개수 = ${latLngs.size}")
+                
                 if (latLngs.isEmpty()) {
-                    Toast.makeText(this@MapActivity, "경로 없음", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapActivity, "경로 좌표가 없습니다", Toast.LENGTH_SHORT).show()
+                    Log.w("Route", "경로 좌표가 비어있음")
                     return@onSuccess
                 }
 
@@ -83,9 +126,11 @@ class MapActivity : AppCompatActivity() {
                 val routeLine = PolylineOptions.from(mapPoints, 10f, Color.parseColor("#1565C0"))
                 shapeLayer.addPolyline(routeLine)
 
+                Log.d("Route", "경로 그리기 완료: ${latLngs.size}개 좌표")
                 moveCameraToFit(kakaoMap, latLngs, padding = 0.15)
             }.onFailure { e ->
                 Log.e("Route", "❌ API 실패", e)
+                Log.e("Route", "에러 메시지: ${e.message}")
                 Toast.makeText(this@MapActivity, "경로 조회 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -128,4 +173,24 @@ class MapActivity : AppCompatActivity() {
 }
 
 /** 로그인 후 받은 access_token을 여기 저장/복원해서 사용 */
-object MyTokenStore { var token: String? = null }
+object MyTokenStore { 
+    private var _token: String? = null 
+    
+    /**
+     * 토큰을 저장합니다
+     */
+    fun setToken(newToken: String) {
+        _token = newToken
+        Log.d("MyTokenStore", "토큰 저장 완료")
+    }
+    
+    /**
+     * 저장된 토큰을 반환합니다
+     */
+    fun getToken(): String? = _token
+    
+    /**
+     * 토큰이 유효한지 확인합니다
+     */
+    fun hasValidToken(): Boolean = !_token.isNullOrBlank()
+}
