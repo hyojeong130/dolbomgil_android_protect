@@ -3,11 +3,49 @@ package com.example.dive_pre
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dive_pre.databinding.ActivitySignUpStep1Binding
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+
+// 회원가입 요청 데이터 클래스
+data class SignUpRequest(
+    val user_id: String,
+    val name: String,
+    val phone_number: String,
+    val password: String
+)
+
+// 회원가입 응답 데이터 클래스
+data class SignUpResponse(
+    val success: Boolean,
+    val message: String,
+    val user: UserData
+)
+
+data class UserData(
+    val user_id: String,
+    val name: String,
+    val phone_number: String
+)
 
 class SignUpStep1Activity : AppCompatActivity() {
     private lateinit var vb: ActivitySignUpStep1Binding
+    
+    companion object {
+        private const val TAG = "SignUpStep1Activity"
+        private val BASE_URL = BuildConfig.API_BASE_URL
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +81,70 @@ class SignUpStep1Activity : AppCompatActivity() {
 
         // 다음 단계 이동
         vb.btnNext.setOnClickListener {
-            startActivity(Intent(this, SignUpStep2Activity::class.java))
+            performSignUp()
+        }
+    }
+    
+    private fun performSignUp() {
+        // 입력값 검증
+        val name = vb.rowName.etValue.text.toString().trim()
+        val phone = vb.rowPhone.etValue.text.toString().trim()
+        val userId = vb.rowId.etValue.text.toString().trim()
+        val password = vb.rowPw.etValue.text.toString().trim()
+        
+        if (name.isEmpty() || phone.isEmpty() || userId.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "모든 필드를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // 회원가입 API 호출
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val result = signUpApi(userId, name, phone, password)
+                if (result.success) {
+                    Toast.makeText(this@SignUpStep1Activity, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                    // 회원가입 성공 시 다음 단계로 이동
+                    startActivity(Intent(this@SignUpStep1Activity, SignUpStep2Activity::class.java))
+                    finish()
+                } else {
+                    Toast.makeText(this@SignUpStep1Activity, "회원가입 실패: ${result.message}", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "회원가입 오류", e)
+                Toast.makeText(this@SignUpStep1Activity, "회원가입 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private suspend fun signUpApi(userId: String, name: String, phone: String, password: String): SignUpResponse {
+        return withContext(Dispatchers.IO) {
+            val client = OkHttpClient()
+            
+            val requestBody = JSONObject().apply {
+                put("user_id", userId)
+                put("name", name)
+                put("phone_number", phone)
+                put("password", password)
+            }.toString()
+            
+            val mediaType = "application/json; charset=utf-8".toMediaType()
+            val body = requestBody.toRequestBody(mediaType)
+            
+            val request = Request.Builder()
+                .url("$BASE_URL/api/user/register")
+                .post(body)
+                .addHeader("Content-Type", "application/json")
+                .build()
+            
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() ?: throw Exception("응답이 비어있습니다")
+            
+            if (!response.isSuccessful) {
+                throw Exception("HTTP 오류: ${response.code}")
+            }
+            
+            val gson = Gson()
+            gson.fromJson(responseBody, SignUpResponse::class.java)
         }
     }
 }

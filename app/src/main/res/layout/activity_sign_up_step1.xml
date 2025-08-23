@@ -93,7 +93,7 @@
             android:background="@drawable/bg_btn_next"
             android:backgroundTint="@null"
             app:backgroundTint="@null"
-            android:text="Next"
+            android:text="Complete"
             android:textAllCaps="false"
             android:textColor="#595959"
             android:textSize="25sp"

@@ -28,6 +28,11 @@ android {
             "KAKAO_NATIVE_APP_KEY",                               // ← 필드 이름
             "\"${project.findProperty("KAKAO_NATIVE_APP_KEY")}\"" // ← local.properties의 키 이름
         )
+        buildConfigField(
+            "String",
+            "API_BASE_URL",                                        // ← API URL 필드 이름
+            "\"${project.properties["API_BASE_URL"] ?: "http://43.201.126.183:7777"}\""          // ← local.properties의 키 이름
+        )
     }
 
     buildTypes {
@@ -85,6 +90,12 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     implementation("androidx.appcompat:appcompat:1.7.1")
+    
+    // HTTP 통신을 위한 의존성
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     testImplementation(libs.junit)
 //    androidTestImplementation(libs.androidx.junit)
