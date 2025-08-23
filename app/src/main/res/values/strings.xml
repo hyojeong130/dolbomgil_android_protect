@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DIVE_PRE</string>
+    <string name="app_name">dive_pre</string>
     <string name="back">뒤로가기</string>
 
     <!-- Gender selection options -->
