@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.text.InputType
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dive_pre.databinding.ActivitySignUpStep1Binding
-import com.example.dive_pre.databinding.ViewInputRowBinding
 
 class SignUpStep1Activity : AppCompatActivity() {
-
     private lateinit var vb: ActivitySignUpStep1Binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,31 +14,36 @@ class SignUpStep1Activity : AppCompatActivity() {
         vb = ActivitySignUpStep1Binding.inflate(layoutInflater)
         setContentView(vb.root)
 
-        // 각 줄(row) 세팅
-        vb.rowName.setupRow(label = "Name",  inputType = InputType.TYPE_CLASS_TEXT,       hint = "이름 입력")
-        vb.rowPhone.setupRow(label = "Phone", inputType = InputType.TYPE_CLASS_PHONE,      hint = "010-0000-0000")
-        vb.rowId.setupRow(label   = "ID",    inputType = InputType.TYPE_CLASS_TEXT,       hint = "아이디 입력")
-        vb.rowPw.setupRow(label   = "Password",
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD,
-            hint = "비밀번호 입력")
+        // 타이틀/역할 문구
+        vb.tvTitle.text = "Sign Up"
+        vb.tvRole.text = "For 보호자용"
 
-        // 버튼
-        vb.btnBack.setOnClickListener { finish() }
+        // 각 입력 라벨/힌트/타입 세팅 (view_input_row 재사용)
+        vb.rowName.tvLabel.text = "Name"
+        vb.rowName.etValue.hint = ""
+
+        vb.rowPhone.tvLabel.text = "Phone"
+        vb.rowPhone.etValue.apply {
+            hint = "010-0000-0000"
+            inputType = InputType.TYPE_CLASS_PHONE
+        }
+
+        vb.rowId.tvLabel.text = "ID"
+        vb.rowId.etValue.hint = "영어 + 숫자"
+
+        vb.rowPw.tvLabel.text = "Password"
+        vb.rowPw.etValue.apply {
+            hint = "영어 + 숫자 + 특수문자"
+            inputType = InputType.TYPE_CLASS_TEXT or
+                    InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+
+        // 상단 왼쪽 뒤로가기: 로그인 화면으로 복귀
+        vb.ibBack.setOnClickListener { finish() } // 로그인에서 들어왔으니 finish()면 복귀
+
+        // 다음 단계 이동
         vb.btnNext.setOnClickListener {
             startActivity(Intent(this, SignUpStep2Activity::class.java))
         }
     }
-}
-
-/** 재사용 가능한 Row 설정용 확장함수 */
-private fun ViewInputRowBinding.setupRow(
-    label: String,
-    inputType: Int? = null,
-    text: String? = null,
-    hint: String? = null
-) {
-    tvLabel.text = label
-    inputType?.let { etValue.inputType = it }
-    text?.let { etValue.setText(it) }
-    hint?.let { etValue.hint = it }
 }

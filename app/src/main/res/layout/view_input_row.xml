@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- view_input_row.xml -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/bg_input_pill"
+    android:paddingStart="24dp"
+    android:paddingEnd="29dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
 
     <TextView
         android:id="@+id/tvLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:gravity="center_vertical"
         android:text="Label"
-        android:textSize="14sp"
-        android:textColor="#777777"
-        android:layout_marginBottom="6dp"/>
+        android:textSize="20sp"
+        android:textColor="#ABABAB"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <EditText
         android:id="@+id/etValue"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
         android:background="@android:color/transparent"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:hint="입력"
-        android:singleLine="true"
-        android:backgroundTint="@android:color/transparent"/>
-
-    <!-- 우측 고정 텍스트가 필요할 때만 보이게 -->
-    <TextView
-        android:id="@+id/tvTrailing"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:text=""
-        android:paddingEnd="16dp"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone"/>
-
-</merge>
+        android:backgroundTint="@android:color/transparent"
+        android:padding="0dp"
+        android:gravity="center_vertical|end"
+        android:textAlignment="viewEnd"
+        android:textSize="20sp"
+        android:textColor="#303030"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColorHint="#BDBDBD"
+        android:imeOptions="actionDone"
+        app:layout_constraintStart_toEndOf="@id/tvLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="home_side_pad">27dp</dimen>
+    <dimen name="home_top_offset">100dp</dimen>
+    <dimen name="home_gap">14dp</dimen>
+
+    <dimen name="home_card_h">162dp</dimen>         <!-- 위 3개 카드 높이 -->
+    <dimen name="home_card_guide_h">125dp</dimen>   <!-- 하단 큰 카드 높이 -->
+</resources>
