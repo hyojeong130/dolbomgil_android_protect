@@ -35,11 +35,8 @@ android {
         val kakaoMapKey = localProps.getProperty("KAKAO_NATIVE_MAP_APP_KEY") ?: ""
         buildConfigField("String", "KAKAO_NATIVE_MAP_APP_KEY", "\"$kakaoMapKey\"")
 
-        buildConfigField(
-            "String",
-            "KAKAO_NATIVE_APP_KEY",                               // ← 필드 이름
-            "\"${project.findProperty("KAKAO_NATIVE_APP_KEY")}\"" // ← local.properties의 키 이름
-        )
+        val kakaoAppKey = localProps.getProperty("KAKAO_NATIVE_APP_KEY") ?: ""
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoAppKey\"")
         buildConfigField(
             "String",
             "API_BASE_URL",                                        // ← API URL 필드 이름

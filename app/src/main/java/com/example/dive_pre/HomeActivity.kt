@@ -20,6 +20,7 @@ import com.example.dive_pre.databinding.ViewCardSettingBinding
 import com.example.dive_pre.databinding.ViewCardGuideBinding
 import com.example.dive_pre.api.ApiService
 import com.example.dive_pre.api.HomeInfoResponse
+import com.example.dive_pre.api.LocationBothResponse
 import com.example.dive_pre.utils.TokenManager
 import android.util.Log
 import android.widget.Toast
@@ -81,10 +82,10 @@ class HomeActivity : AppCompatActivity() {
             renderSettingsCard()
         }
 
-        // 길안내 카드: 지도 열기
+        // 길안내 카드: 바로 내비게이션 시작
         guideCard.root.setOnClickListener {
-            val uri = Uri.parse("geo:$targetLat,$targetLng?q=$targetLat,$targetLng($careeName)")
-            startActivity(Intent(Intent.ACTION_VIEW, uri))
+            val intent = Intent(this@HomeActivity, NaviActivity::class.java)
+            this@HomeActivity.startActivity(intent)
         }
 
         vb.btnMap.setOnClickListener {
@@ -151,6 +152,39 @@ class HomeActivity : AppCompatActivity() {
                 Toast.makeText(this@HomeActivity, "네트워크 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+    
+    private fun startNavigationFromLocationApi() {
+        lifecycleScope.launch {
+            try {
+                val accessToken = TokenManager.getAccessToken(this@HomeActivity)
+                if (accessToken != null) {
+                    val locationResponse = ApiService.getBothLocations(accessToken)
+                    
+                    val startLat = locationResponse.protector_location.latitude
+                    val startLng = locationResponse.protector_location.longitude
+                    val endLat = locationResponse.caree_location.latitude  
+                    val endLng = locationResponse.caree_location.longitude
+                    
+                    startNavigation(startLat, startLng, endLat, endLng)
+                } else {
+                    Toast.makeText(this@HomeActivity, "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("HomeActivity", "내비게이션 시작 실패", e)
+                Toast.makeText(this@HomeActivity, "위치 정보를 불러올 수 없습니다", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun startNavigation(startLat: Double, startLng: Double, endLat: Double, endLng: Double) {
+        val intent = Intent(this, NaviActivity::class.java).apply {
+            putExtra("start_lat", startLat)
+            putExtra("start_lng", startLng)
+            putExtra("end_lat", endLat)
+            putExtra("end_lng", endLng)
+        }
+        startActivity(intent)
     }
 
 
