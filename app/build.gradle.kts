@@ -18,6 +18,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildFeatures { viewBinding = true}
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
@@ -84,6 +85,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation(libs.play.services.maps)
 
     testImplementation(libs.junit)
 //    androidTestImplementation(libs.androidx.junit)
@@ -92,5 +94,12 @@ dependencies {
 //    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+// Gson을 쓰고 싶으면 converter-gson
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.activity:activity-ktx:1.9.2")
 
 }

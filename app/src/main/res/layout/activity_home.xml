@@ -9,6 +9,7 @@
     android:paddingEnd="@dimen/home_side_pad"
     tools:context=".HomeActivity">
 
+    <!-- 프로필 섹션 -->
     <LinearLayout
         android:id="@+id/profileSection"
         android:layout_width="wrap_content"
@@ -18,13 +19,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- 원형 프로필 대체 -->
         <View
             android:layout_width="55dp"
             android:layout_height="55dp"
             android:background="@drawable/bg_profile_placeholder"/>
 
-        <!-- 이름 -->
         <TextView
             android:id="@+id/tvProfileName"
             android:layout_width="wrap_content"
@@ -35,30 +34,27 @@
             android:textSize="18sp" />
     </LinearLayout>
 
-
-    <!-- 1) 상단 넓은 카드 -->
-    <!-- activity_home.xml -->
+    <!-- 1) 상단 넓은 카드: 자동 안심 케어 -->
     <FrameLayout
         android:id="@+id/cardAuto"
         android:layout_width="0dp"
         android:layout_height="@dimen/home_card_h"
         android:background="@drawable/bg_card_auto_on"
-        app:layout_constraintTop_toBottomOf="@id/profileSection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="@dimen/home_gap"
         android:paddingStart="16dp"
         android:paddingTop="16dp"
         android:paddingEnd="25dp"
-        android:paddingBottom="25dp">
+        android:paddingBottom="25dp"
+        app:layout_constraintTop_toBottomOf="@id/profileSection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- ⬇️ include에 id 추가 -->
         <include
             android:id="@+id/includeAuto"
-            layout="@layout/view_card_auto" />
+            layout="@layout/view_card_auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </FrameLayout>
-
-
 
     <!-- 2) 가운데 행: 위치 카드 -->
     <FrameLayout
@@ -68,15 +64,22 @@
         android:background="@drawable/bg_card_location"
         android:layout_marginTop="@dimen/home_gap"
         android:layout_marginEnd="@dimen/home_gap"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="25dp"
+        android:paddingBottom="25dp"
         app:layout_constraintTop_toBottomOf="@id/cardAuto"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/cardSettings"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintHorizontal_weight="198"
-        android:paddingStart="16dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="25dp"
-        android:paddingBottom="25dp"/>
+        app:layout_constraintHorizontal_weight="198">
+
+        <include
+            android:id="@+id/includeLocation"
+            layout="@layout/view_card_location"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
     <!-- 3) 가운데 행: 설정 카드 -->
     <FrameLayout
@@ -85,28 +88,42 @@
         android:layout_height="@dimen/home_card_h"
         android:background="@drawable/bg_card_location"
         android:layout_marginTop="@dimen/home_gap"
-        app:layout_constraintTop_toBottomOf="@id/cardAuto"
-        app:layout_constraintStart_toEndOf="@id/cardLocation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="127"
         android:paddingStart="16dp"
         android:paddingTop="16dp"
         android:paddingEnd="25dp"
-        android:paddingBottom="25dp"/>
+        android:paddingBottom="25dp"
+        app:layout_constraintTop_toBottomOf="@id/cardAuto"
+        app:layout_constraintStart_toEndOf="@id/cardLocation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="127">
 
-    <!-- 4) 하단 큰 카드 -->
+        <include
+            android:id="@+id/includeSettings"
+            layout="@layout/view_card_setting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <!-- 4) 하단 큰 카드: 바로 길안내 -->
     <FrameLayout
         android:id="@+id/cardGuide"
         android:layout_width="0dp"
         android:layout_height="@dimen/home_card_guide_h"
         android:background="@drawable/bg_card_guide"
         android:layout_marginTop="@dimen/home_gap"
-        app:layout_constraintTop_toBottomOf="@id/cardLocation"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:paddingStart="16dp"
         android:paddingTop="16dp"
         android:paddingEnd="25dp"
-        android:paddingBottom="25dp"/>
+        android:paddingBottom="25dp"
+        app:layout_constraintTop_toBottomOf="@id/cardLocation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <include
+            android:id="@+id/includeGuide"
+            layout="@layout/view_card_guide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
