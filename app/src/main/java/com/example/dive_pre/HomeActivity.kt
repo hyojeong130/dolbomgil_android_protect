@@ -68,11 +68,9 @@ class HomeActivity : AppCompatActivity() {
             toggleSafeZone()
         }
 
-        // 위치 카드: 전체 클릭으로 상태 토글(데모)
+        // 위치 카드: 클릭 시 MapActivity로 이동
         locationCard.root.setOnClickListener {
-            inSafeZone = !inSafeZone!!
-            renderLocationCard()
-            renderGuideCard()
+            startActivity(Intent(this, MapActivity::class.java))
         }
 
 
@@ -88,9 +86,7 @@ class HomeActivity : AppCompatActivity() {
             this@HomeActivity.startActivity(intent)
         }
 
-        vb.btnMap.setOnClickListener {
-            startActivity(Intent(this, MapActivity::class.java))
-        }
+
     }
     
     private fun loadHomeData() {
