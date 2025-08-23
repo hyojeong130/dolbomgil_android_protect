@@ -18,6 +18,13 @@ import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.shape.MapPoints
 import com.kakao.vectormap.shape.PolylineOptions
+import com.kakao.vectormap.label.LabelOptions
+import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.label.LabelStyles
+import com.kakao.vectormap.label.LabelTextBuilder
+import com.kakao.vectormap.label.LabelTextStyle
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -126,6 +133,9 @@ class MapActivity : AppCompatActivity() {
                 val routeLine = PolylineOptions.from(mapPoints, 10f, Color.parseColor("#1565C0"))
                 shapeLayer.addPolyline(routeLine)
 
+                // 출발지(보호자)와 도착지(피보호자) 마커 추가
+                addStartAndEndMarkers(kakaoMap, resp)
+
                 Log.d("Route", "경로 그리기 완료: ${latLngs.size}개 좌표")
                 moveCameraToFit(kakaoMap, latLngs, padding = 0.15)
             }.onFailure { e ->
@@ -133,6 +143,95 @@ class MapActivity : AppCompatActivity() {
                 Log.e("Route", "에러 메시지: ${e.message}")
                 Toast.makeText(this@MapActivity, "경로 조회 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    /**
+     * 출발지(보호자)와 도착지(피보호자)에 마커를 추가합니다
+     */
+    private fun addStartAndEndMarkers(kakaoMap: KakaoMap, routeResponse: RouteResponse) {
+        val route = routeResponse.routes.firstOrNull() ?: return
+        
+        try {
+            // 출발지 마커 (보호자 - 파란색 핀)
+            val startPoint = route.summary.origin
+            val startLatLng = LatLng.from(startPoint.y, startPoint.x)
+            
+            // 출발지 마커 추가 (보호자 아이콘)
+            addMarker(
+                kakaoMap = kakaoMap,
+                position = startLatLng,
+                iconResId = R.drawable.ic_pin_protector,
+                title = "보호자 (출발지)"
+            )
+            
+            // 도착지 마커 (피보호자 - 빨간색 핀)
+            val endPoint = route.summary.destination
+            val endLatLng = LatLng.from(endPoint.y, endPoint.x)
+            
+            // 도착지 마커 추가 (피보호자 아이콘)
+            addMarker(
+                kakaoMap = kakaoMap,
+                position = endLatLng,
+                iconResId = R.drawable.ic_pin_caree,
+                title = "피보호자 (도착지)"
+            )
+            
+            Log.d("Route", "마커 추가 완료: 출발지(${startPoint.y}, ${startPoint.x}), 도착지(${endPoint.y}, ${endPoint.x})")
+            
+        } catch (e: Exception) {
+            Log.e("Route", "마커 추가 실패", e)
+        }
+    }
+    
+    /**
+     * 지도에 마커를 추가합니다 (큰 원형 polyline으로 구현)
+     */
+    private fun addMarker(kakaoMap: KakaoMap, position: LatLng, iconResId: Int, title: String) {
+        try {
+            val labelManager = kakaoMap.labelManager ?: return
+            val labelLayer = labelManager.layer ?: return
+            
+            // 텍스트 스타일 (크기/색)
+            fun textStyles(size: Int, color: Int): LabelStyles =
+                LabelStyles.from(
+                    LabelStyle.from(LabelTextStyle.from(size, color))
+                )
+            
+            // 아이콘 스타일 (리소스 아이콘 그대로 사용)
+            fun iconStyles(iconResId: Int): LabelStyles =
+                LabelStyles.from(
+                    LabelStyle.from(iconResId)
+                )
+            
+            // 아이콘 마커 추가
+            val iconOptions = LabelOptions
+                .from(position)
+                .setStyles(iconStyles(iconResId))
+                .setRank(100)
+            
+            val iconLabel = labelLayer.addLabel(iconOptions)
+            
+            // 텍스트 마커 추가 (아이콘 위에 표시)
+            val textOptions = LabelOptions
+                .from(position)
+                .setStyles(textStyles(18, Color.BLACK))
+                .setTexts(LabelTextBuilder().setTexts(title))
+                .setRank(101)
+            
+            val textLabel = labelLayer.addLabel(textOptions)
+            
+            // 텍스트를 아이콘 위로 약간 올리기
+            textLabel?.changePixelOffset(0f, -20f)
+            
+            if (iconLabel != null && textLabel != null) {
+                Log.d("Route", "마커 추가 성공: $title at (${position.latitude}, ${position.longitude})")
+            } else {
+                Log.w("Route", "마커 추가 실패: $title")
+            }
+            
+        } catch (e: Exception) {
+            Log.e("Route", "마커 추가 중 오류: $title", e)
         }
     }
 
