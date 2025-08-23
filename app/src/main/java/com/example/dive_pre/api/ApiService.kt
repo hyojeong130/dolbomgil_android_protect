@@ -4,6 +4,7 @@ import android.os.Build
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -167,4 +168,54 @@ object ApiService {
     private fun getDeviceType(): String {
         return "android"
     }
+
+    suspend fun getProtectorToCareeRoute(
+        accessToken: String,
+        priority: String? = "RECOMMEND",   // RECOMMEND | TIME | DISTANCE
+        summary: Boolean? = true,
+        alternatives: Boolean? = false,
+        roadDetails: Boolean? = false,
+        carFuel: String? = null,           // GASOLINE | DIESEL | LPG
+        carHipass: Boolean? = null
+    ): RouteResponse = withContext(Dispatchers.IO) {
+
+        val ROUTE_ENDPOINT = "/navigation/route/protector-to-caree"
+
+
+        val client = OkHttpClient()
+        val gson = Gson()
+
+        // BASE_URL + ROUTE_ENDPOINT + 쿼리
+        // BASE_URL + ROUTE_ENDPOINT + 쿼리
+        val url = ("$BASE_URL$ROUTE_ENDPOINT").toHttpUrlOrNull()
+            ?.newBuilder()
+            ?.apply {
+                priority?.let { this.addQueryParameter("priority", it) }
+                summary?.let { this.addQueryParameter("summary", it.toString()) }
+                alternatives?.let { this.addQueryParameter("alternatives", it.toString()) }
+                roadDetails?.let { this.addQueryParameter("road_details", it.toString()) }
+                carFuel?.let { this.addQueryParameter("car_fuel", it) }
+                carHipass?.let { this.addQueryParameter("car_hipass", it.toString()) }
+            }
+            ?.build() ?: throw IllegalStateException("잘못된 URL: $BASE_URL$ROUTE_ENDPOINT")
+
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .addHeader("Accept", "application/json")
+            .addHeader("Authorization", "Bearer $accessToken") // ★ 필수
+            .build()
+
+        val response = client.newCall(request).execute()
+        val responseBody = response.body?.string()
+            ?: throw Exception("응답이 비어있습니다")
+
+        if (!response.isSuccessful) {
+            throw Exception("HTTP 오류: ${response.code} ${response.message}\n$responseBody")
+        }
+
+        gson.fromJson(responseBody, RouteResponse::class.java)
+    }
+
 }
