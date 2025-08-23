@@ -3,14 +3,26 @@ package com.example.dive_pre
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.dive_pre.api.ApiService
 import com.example.dive_pre.databinding.ActivityLoginBinding
 import com.example.dive_pre.databinding.ViewInputRowBinding
+import com.example.dive_pre.utils.FCMUtils
+import com.example.dive_pre.utils.TokenManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var vb: ActivityLoginBinding
+    
+    companion object {
+        private const val TAG = "LoginActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,8 +36,7 @@ class LoginActivity : AppCompatActivity() {
 
         // 로그인
         vb.btnLogin.setOnClickListener {
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
+            performLogin()
         }
         // 상단 우측 Sign Up 텍스트
         vb.tvSignUp.setOnClickListener {
@@ -41,6 +52,67 @@ class LoginActivity : AppCompatActivity() {
                 inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             } else {
                 inputType = InputType.TYPE_CLASS_TEXT
+            }
+        }
+    }
+    
+    private fun performLogin() {
+        val userId = vb.rowId.etValue.text.toString().trim()
+        val password = vb.rowPw.etValue.text.toString().trim()
+        
+        if (userId.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "아이디와 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val fcmToken = FCMUtils.getFCMToken()
+                if (fcmToken == null) {
+                    Toast.makeText(this@LoginActivity, "FCM 토큰을 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                
+                val loginResponse = ApiService.login(userId, password, fcmToken)
+                
+                if (loginResponse.success) {
+                    TokenManager.saveAccessToken(this@LoginActivity, loginResponse.access_token)
+                    Toast.makeText(this@LoginActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
+                    
+                    // 케어 대상자 등록 상태 확인
+                    checkCareeRegistrationStatus(loginResponse.access_token)
+                } else {
+                    Toast.makeText(this@LoginActivity, "로그인 실패: ${loginResponse.message}", Toast.LENGTH_SHORT).show()
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "로그인 오류", e)
+                Toast.makeText(this@LoginActivity, "로그인 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun checkCareeRegistrationStatus(accessToken: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val careeStatusResponse = ApiService.checkCareeStatus(accessToken)
+                
+                if (careeStatusResponse.has_registered_caree) {
+                    // 이미 케어 대상자가 등록되어 있으면 홈으로 이동
+                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                    finish()
+                } else {
+                    // 케어 대상자가 등록되어 있지 않으면 Step2 회원가입으로 이동
+                    startActivity(Intent(this@LoginActivity, SignUpStep2Activity::class.java))
+                    finish()
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "케어 대상자 상태 확인 오류", e)
+                Toast.makeText(this@LoginActivity, "상태 확인 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                // 오류 발생 시 홈으로 이동 (기본값)
+                startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                finish()
             }
         }
     }
