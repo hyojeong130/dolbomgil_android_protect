@@ -20,14 +20,30 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
+        // TODO: 서버에 새로운 토큰을 전송하는 로직 추가
+        // sendRegistrationToServer(token)
     }
-
+    
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d(TAG, "From: ${remoteMessage.from}")
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
+            
+            // 데이터 페이로드가 있으면 알림 생성
+            val title = remoteMessage.data["type"]?.let { type ->
+                when (type) {
+                    "geofence_breach" -> "안전구역 이탈 알림"
+                    else -> "새로운 알림"
+                }
+            } ?: "새로운 알림"
+            
+            val message = remoteMessage.data["caree_name"]?.let { name ->
+                "${name}님이 안전구역을 벗어났습니다.⚠️"
+            } ?: "새로운 메시지가 있습니다."
+            
+            sendNotification(title, message)
         }
 
         // Check if message contains a notification payload.
@@ -50,6 +66,8 @@ class FCMService : FirebaseMessagingService() {
             .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -59,8 +77,13 @@ class FCMService : FirebaseMessagingService() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "FCM 알림",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "피보호자 안전 관련 중요 알림"
+                enableVibration(true)
+                vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
+                setShowBadge(true)
+            }
             notificationManager.createNotificationChannel(channel)
         }
 
