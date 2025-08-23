@@ -126,22 +126,30 @@ class HomeActivity : AppCompatActivity() {
         val root = vb.homeRoot
         val cs = ConstraintSet().apply { clone(root) }
 
-        // 기존 TOP 제약 정리
+        // 기존 TOP 제약을 모두 정리
         cs.clear(R.id.cardGuide, ConstraintSet.TOP)
         cs.clear(R.id.cardLocation, ConstraintSet.TOP)
+        cs.clear(R.id.cardSettings, ConstraintSet.TOP)
+
+        val gap = resources.getDimensionPixelSize(R.dimen.home_gap)
 
         if (inSafeZone) {
-            // 안전: 위치/설정 위, 길안내 아래
+            // ✅ 안전: 가운데 2개(위치/설정)가 'cardAuto' 바로 아래, 그 아래가 길안내
             cs.connect(R.id.cardLocation, ConstraintSet.TOP, R.id.cardAuto, ConstraintSet.BOTTOM)
+            cs.connect(R.id.cardSettings, ConstraintSet.TOP, R.id.cardAuto, ConstraintSet.BOTTOM)
             cs.connect(R.id.cardGuide,    ConstraintSet.TOP, R.id.cardLocation, ConstraintSet.BOTTOM)
         } else {
-            // 이탈: 길안내를 위로, 그 아래 위치/설정
+            // ✅ 이탈: 길안내를 위로 올리고, 그 아래에 가운데 2개(위치/설정)
             cs.connect(R.id.cardGuide,    ConstraintSet.TOP, R.id.cardAuto, ConstraintSet.BOTTOM)
             cs.connect(R.id.cardLocation, ConstraintSet.TOP, R.id.cardGuide, ConstraintSet.BOTTOM)
-            // settings는 location 오른쪽 기존 제약 유지
+            cs.connect(R.id.cardSettings, ConstraintSet.TOP, R.id.cardGuide, ConstraintSet.BOTTOM)
         }
-
-        androidx.transition.TransitionManager.beginDelayedTransition(root)
+        cs.setMargin(R.id.cardLocation, ConstraintSet.TOP, gap)
+        cs.setMargin(R.id.cardSettings, ConstraintSet.TOP, gap)
+        cs.setMargin(R.id.cardGuide,    ConstraintSet.TOP, gap)
+        cs.setMargin(R.id.cardLocation, ConstraintSet.END, gap)
+        // 부드러운 전환(선택)
+        TransitionManager.beginDelayedTransition(root)
         cs.applyTo(root)
     }
 
