@@ -101,7 +101,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation(libs.play.services.maps)
+    implementation("com.kakao.maps.open:android:2.12.8")
 
     // HTTP 통신을 위한 의존성
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
