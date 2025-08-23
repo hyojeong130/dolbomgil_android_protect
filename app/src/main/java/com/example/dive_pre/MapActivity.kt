@@ -10,6 +10,7 @@ import com.example.dive_pre.api.ApiService
 import com.example.dive_pre.api.RouteResponse
 import com.example.dive_pre.api.toLatLngs
 import com.example.dive_pre.utils.TokenManager
+import com.example.dive_pre.NaviActivity
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
@@ -40,6 +41,9 @@ class MapActivity : AppCompatActivity() {
         // 저장된 access_token을 MyTokenStore에 복원
         restoreAccessToken()
 
+        // 안내 시작 버튼 설정
+        setupNavigationButton()
+
         mapView = findViewById(R.id.map_view)
         mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {}
@@ -56,6 +60,32 @@ class MapActivity : AppCompatActivity() {
                 fetchAndDrawRoute(kakaoMap)
             }
         })
+    }
+
+    /**
+     * 안내 시작 버튼 설정
+     */
+    private fun setupNavigationButton() {
+        val btnStartNav = findViewById<android.widget.Button>(R.id.btn_start_nav)
+        btnStartNav.setOnClickListener {
+            Log.d("MapActivity", "안내 시작 버튼 클릭됨")
+            startNavigation()
+        }
+    }
+
+    /**
+     * 네비게이션 화면으로 이동
+     */
+    private fun startNavigation() {
+        try {
+            Log.d("MapActivity", "NaviActivity로 이동 시작")
+            val intent = android.content.Intent(this, NaviActivity::class.java)
+            startActivity(intent)
+            Log.d("MapActivity", "NaviActivity로 이동 완료")
+        } catch (e: Exception) {
+            Log.e("MapActivity", "NaviActivity 이동 실패: $e")
+            Toast.makeText(this, "네비게이션 화면 이동에 실패했습니다", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**
