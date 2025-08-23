@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 
@@ -26,6 +27,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildFeatures { viewBinding = true}
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
@@ -33,8 +35,16 @@ android {
         val kakaoMapKey = localProps.getProperty("KAKAO_NATIVE_MAP_APP_KEY") ?: ""
         buildConfigField("String", "KAKAO_NATIVE_MAP_APP_KEY", "\"$kakaoMapKey\"")
 
-        val kakaoNaviKey = localProps.getProperty("KAKAO_NATIVE_APP_KEY") ?: ""
-        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNaviKey\"")
+        buildConfigField(
+            "String",
+            "KAKAO_NATIVE_APP_KEY",                               // ← 필드 이름
+            "\"${project.findProperty("KAKAO_NATIVE_APP_KEY")}\"" // ← local.properties의 키 이름
+        )
+        buildConfigField(
+            "String",
+            "API_BASE_URL",                                        // ← API URL 필드 이름
+            "\"${project.properties["API_BASE_URL"] ?: "http://43.201.126.183:7777"}\""          // ← local.properties의 키 이름
+        )
     }
 
     buildTypes {
@@ -91,6 +101,13 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation(libs.play.services.maps)
+
+    // HTTP 통신을 위한 의존성
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     testImplementation(libs.junit)
 //    androidTestImplementation(libs.androidx.junit)
@@ -99,5 +116,14 @@ dependencies {
 //    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+// Gson을 쓰고 싶으면 converter-gson
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+    implementation("com.google.firebase:firebase-messaging:21.1.0")
 
 }
