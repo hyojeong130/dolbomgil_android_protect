@@ -80,24 +80,6 @@ data class DetailedRoute(
     val duration: Int
 )
 
-data class RoutePoint(
-    val name: String,
-    val x: Double,
-    val y: Double
-)
-
-data class RouteBound(
-    val min_x: Double,
-    val min_y: Double,
-    val max_x: Double,
-    val max_y: Double
-)
-
-data class RouteFare(
-    val taxi: Int,
-    val toll: Int
-)
-
 data class DetailedSummary(
     val origin: RoutePoint,
     val destination: RoutePoint,
